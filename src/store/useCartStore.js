@@ -85,6 +85,34 @@ export const useCartStore = create((set, get) => ({
   },
 
   /**
+   * decrementQty: Mengurangi kuantitas item di keranjang. Jika qty mencapai 1, hapus dari keranjang.
+   * 
+   * ALIRAN STATE (Flow):
+   * 1. Komponen memanggil `decrementQty(id)`.
+   * 2. Cari item di keranjang. Jika kuantitas > 1, kurangi 1.
+   * 3. Jika kuantitas == 1, hapus item tersebut dari keranjang (sama seperti `removeFromCart`).
+   * 4. Panggil `set()` untuk memperbarui `cart` global dan men-trigger re-render UI.
+   */
+  decrementQty: (id) => {
+    const cart = get().cart;
+    const existing = cart.find((item) => item.id === id);
+
+    if (existing) {
+      if (existing.qty > 1) {
+        set({
+          cart: cart.map((item) =>
+            item.id === id ? { ...item, qty: item.qty - 1 } : item
+          ),
+        });
+      } else {
+        set({
+          cart: cart.filter((item) => item.id !== id),
+        });
+      }
+    }
+  },
+
+  /**
    * clearCart: Mengosongkan seluruh isi keranjang belanja.
    * 
    * ALIRAN STATE (Flow):
